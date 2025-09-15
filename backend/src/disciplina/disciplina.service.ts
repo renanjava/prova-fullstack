@@ -1,26 +1,34 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateDisciplinaDto } from './dto/create-disciplina.dto';
 import { UpdateDisciplinaDto } from './dto/update-disciplina.dto';
+import { DisciplinaRepository } from './disciplina.repository';
 
 @Injectable()
 export class DisciplinaService {
+  constructor(private readonly disciplinaRepository: DisciplinaRepository) {}
   create(createDisciplinaDto: CreateDisciplinaDto) {
-    return 'This action adds a new disciplina';
+    return this.disciplinaRepository.create(createDisciplinaDto);
   }
 
   findAll() {
-    return `This action returns all disciplina`;
+    return this.disciplinaRepository.findAll();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} disciplina`;
+  async findOne(id: string) {
+    const disciplina = await this.disciplinaRepository.findById(id);
+    if (!disciplina) {
+      throw new NotFoundException('disciplina não encontrada');
+    }
+    return disciplina;
   }
 
-  update(id: number, updateDisciplinaDto: UpdateDisciplinaDto) {
-    return `This action updates a #${id} disciplina`;
+  async update(id: string, updateDisciplinaDto: UpdateDisciplinaDto) {
+    await this.findOne(id);
+    return this.disciplinaRepository.update(id, updateDisciplinaDto);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} disciplina`;
+  async remove(id: string) {
+    await this.findOne(id);
+    return this.disciplinaRepository.remove(id);
   }
 }

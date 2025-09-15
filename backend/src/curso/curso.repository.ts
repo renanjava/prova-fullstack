@@ -6,25 +6,32 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class CursoRepository {
-    constructor(private readonly prismaService: PrismaService) { }
+  constructor(private readonly prismaService: PrismaService) {}
 
-    create(dto: CreateCursoDto): Promise<Curso> {
-        return this.prismaService.curso.create({ data: dto });
-    }
+  create(dto: CreateCursoDto): Promise<Curso> {
+    return this.prismaService.curso.create({
+      data: dto,
+    });
+  }
 
-    findAll(): Promise<Curso[]> {
-        return this.prismaService.curso.findMany();
-    }
+  findAll(): Promise<Curso[]> {
+    return this.prismaService.curso.findMany({
+      include: { disciplinas: true },
+    });
+  }
 
-    findById(id: string): Promise<Curso | null> {
-        return this.prismaService.curso.findUnique({ where: { id } });
-    }
+  findById(id: string): Promise<Curso | null> {
+    return this.prismaService.curso.findUnique({
+      where: { id },
+      include: { disciplinas: true },
+    });
+  }
 
-    update(id: string, dto: UpdateCursoDto): Promise<Curso> {
-        return this.prismaService.curso.update({ where: { id }, data: dto });
-    }
+  update(id: string, dto: UpdateCursoDto): Promise<Curso> {
+    return this.prismaService.curso.update({ where: { id }, data: dto });
+  }
 
-    remove(id: string): Promise<Curso> {
-        return this.prismaService.curso.delete({ where: { id } });
-    }
+  remove(id: string): Promise<Curso> {
+    return this.prismaService.curso.delete({ where: { id } });
+  }
 }

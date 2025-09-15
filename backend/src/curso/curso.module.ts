@@ -9,4 +9,4 @@ import { PrismaModule } from 'src/prisma/prisma.module';
   controllers: [CursoController],
   providers: [CursoService, CursoRepository],
 })
-export class CursoModule { }
+export class CursoModule {}

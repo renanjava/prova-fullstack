@@ -5,7 +5,7 @@ import { CursoRepository } from './curso.repository';
 
 @Injectable()
 export class CursoService {
-  constructor(private readonly cursoRepository: CursoRepository) { }
+  constructor(private readonly cursoRepository: CursoRepository) {}
   create(createCursoDto: CreateCursoDto) {
     return this.cursoRepository.create(createCursoDto);
   }
@@ -22,11 +22,13 @@ export class CursoService {
     return curso;
   }
 
-  update(id: string, updateCursoDto: UpdateCursoDto) {
+  async update(id: string, updateCursoDto: UpdateCursoDto) {
+    await this.findOne(id);
     return this.cursoRepository.update(id, updateCursoDto);
   }
 
-  remove(id: string) {
+  async remove(id: string) {
+    await this.findOne(id);
     return this.cursoRepository.remove(id);
   }
 }
