@@ -6,7 +6,6 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -26,5 +25,5 @@ model Disciplina {
   id       String @id @default(uuid())
   nome     String
   curso_id String
-  curso    Curso  @relation(fields: [curso_id], references: [id])
+  curso    Curso  @relation(fields: [curso_id], references: [id], onDelete: Cascade)
 }
