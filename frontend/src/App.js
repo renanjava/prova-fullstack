@@ -49,6 +49,13 @@ function App() {
             <ul>
                 {disciplinaData.map(disciplina => (
                     <li key={disciplina.id}>
+                      <button onClick={() => {
+                          fetch("http://localhost:3000/disciplina/"+disciplina.id, {
+                            method: 'DELETE'
+                          })
+                          .then(res => res.text())
+                          .then(res => console.log(res))
+                        }}>Delete</button>
                         <p>
                             Nome:
                             {disciplina.nome}
