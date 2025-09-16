@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
+import { API_URL } from "../../constants/constants";
 
 function App() {
-  const API_URL = "http://localhost:3000";
   const [cursoData, setCurso] = useState([])
   const [disciplinaData, setDisciplina] = useState([])
 
