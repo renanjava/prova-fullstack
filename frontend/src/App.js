@@ -28,7 +28,7 @@ function App() {
                             method: 'DELETE'
                           })
                           .then(res => res.text())
-                          .then(res => console.log(res))
+                          .then(res => setCurso(cursoData.filter(c => c.id !== curso.id)))
                         }}>Delete</button>
                         <p>
                             Nome:

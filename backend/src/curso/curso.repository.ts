@@ -16,14 +16,14 @@ export class CursoRepository {
 
   findAll(): Promise<Curso[]> {
     return this.prismaService.curso.findMany({
-      include: { disciplinas: true },
+      include: { Disciplina: true },
     });
   }
 
   findById(id: string): Promise<Curso | null> {
     return this.prismaService.curso.findUnique({
       where: { id },
-      include: { disciplinas: true },
+      include: { Disciplina: true },
     });
   }
 
