@@ -11,7 +11,13 @@ function App() {
     dataInicio: ""
   });
 
+  const [disciplinaForm, setDisciplinaForm] = useState({
+    nome: ""
+  });
+
   const [editCurso, setEditCurso] = useState(null);
+  const [cursoSelecionado, setCursoSelecionado] = useState(null)
+  const [editDisciplina, setEditDisciplina] = useState(null)
 
   useEffect(() => {
     fetch("http://localhost:3000/curso")
@@ -31,6 +37,13 @@ function App() {
       nome: curso.nome,
       cargaHoraria: curso.cargaHoraria,
       dataInicio: curso.dataInicio.split("T")[0]
+    });
+  };
+
+  const handleEditDisciplina = (disciplina) => {
+    setEditDisciplina(disciplina);
+    setDisciplinaForm({
+      nome: disciplina.nome
     });
   };
 
@@ -65,6 +78,44 @@ function App() {
         .then(cursoCriado => {
           setCurso([...cursoData, cursoCriado]);
           setCursoForm({ nome: "", cargaHoraria: 0, dataInicio: "" });
+        });
+    }
+  };
+
+  const handleSubmitDisciplina = (e) => {
+    e.preventDefault();
+
+    if (editDisciplina) {
+      fetch(`http://localhost:3000/disciplina/${editDisciplina.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(disciplinaForm)
+      })
+        .then(res => res.json())
+        .then(disciplinaAtualizada => {
+          setDisciplina(disciplinaData.map(d => d.id === disciplinaAtualizada.id ? disciplinaAtualizada : d));
+          setEditDisciplina(null);
+          setDisciplinaForm({ nome: "" });
+        });
+
+    } else {
+      if (!cursoSelecionado) return;
+
+      const payload = {
+        ...disciplinaForm,
+        curso_id: cursoSelecionado.id
+      };
+
+      fetch("http://localhost:3000/disciplina", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      })
+        .then(res => res.json())
+        .then(disciplinaCriada => {
+          setDisciplina([...disciplinaData, disciplinaCriada]);
+          setDisciplinaForm({ nome: "" });
+          setCursoSelecionado(null);
         });
     }
   };
@@ -114,9 +165,15 @@ function App() {
                             method: 'DELETE'
                           })
                           .then(res => res.text())
-                          .then(res => setCurso(cursoData.filter(c => c.id !== curso.id)))
+                          .then(() => {
+                            setCurso(cursoData.filter(c => c.id !== curso.id))
+                            setDisciplina(disciplinaData.filter(d => d.curso_id !== curso.id))
+                          })
                         }}>Delete</button>
                         <button onClick={() => handleEdit(curso)}>Editar</button>
+                        <button onClick={() => setCursoSelecionado(curso)}>
+                          Adicionar Disciplina
+                        </button>
                         <p>
                             Nome:
                             {curso.nome}
@@ -129,6 +186,20 @@ function App() {
                             Data Início:
                             {curso.dataInicio}
                         </p>
+
+                        {cursoSelecionado && cursoSelecionado.id === curso.id && (
+                          <form onSubmit={handleSubmitDisciplina}>
+                            <input
+                              type="text"
+                              placeholder="Nome da Disciplina"
+                              value={disciplinaForm.nome}
+                              onChange={e => setDisciplinaForm({ ...disciplinaForm, nome: e.target.value })}
+                              required
+                            />
+                            <button type="submit">Salvar Disciplina</button>
+                            <button type="button" onClick={() => setCursoSelecionado(null)}>Cancelar</button>
+                          </form>
+                        )}
                     </li>
                 ))}
             </ul>
@@ -140,9 +211,10 @@ function App() {
                           fetch("http://localhost:3000/disciplina/"+disciplina.id, {
                             method: 'DELETE'
                           })
-                          .then(res => res.text())
-                          .then(res => console.log(res))
+                            .then(res => res.text())
+                            .then(() => setDisciplina(disciplinaData.filter(c => c.id !== disciplina.id)))
                         }}>Delete</button>
+                        <button onClick={() => handleEditDisciplina(disciplina)}>Editar</button>
                         <p>
                             Nome:
                             {disciplina.nome}
@@ -150,6 +222,26 @@ function App() {
                     </li>
                 ))}
             </ul>
+
+            {editDisciplina && (
+        <div>
+          <h2>Editar Disciplina</h2>
+          <form onSubmit={handleSubmitDisciplina}>
+            <input
+              type="text"
+              placeholder="Nome da Disciplina"
+              value={disciplinaForm.nome}
+              onChange={e => setDisciplinaForm({ ...disciplinaForm, nome: e.target.value })}
+              required
+            />
+            <button type="submit">Salvar Alterações</button>
+            <button type="button" onClick={() => {
+              setEditDisciplina(null);
+              setDisciplinaForm({ nome: "" });
+            }}>Cancelar</button>
+          </form>
+        </div>
+      )}
     </div>
   );
 }
